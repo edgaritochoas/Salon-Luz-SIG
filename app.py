@@ -6,8 +6,7 @@ import psycopg2
 st.set_page_config(page_title="Salón Luz - SIG", layout="centered")
 
 # --- CONEXIÓN A LA NUBE (SUPABASE) ---
-DB_URI = "postgresql://postgres:AdminSalonLuz2026!@db.couvhlpyufqbhaczqoto.supabase.co:5432/postgres"
-
+DB_URI = "postgresql://postgres.couvhlpyufqbhaczqoto:AdminSalonLuz2026!@aws-1-us-east-1.pooler.supabase.com:5432/postgres"
 def conectar():
     return psycopg2.connect(DB_URI)
 
