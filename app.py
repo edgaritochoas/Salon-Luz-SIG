@@ -106,23 +106,29 @@ else:
             st.markdown("### 📈 Cierre de Caja Diario (Hora Perú)")
             conn = conectar()
             
+          # --- PESTAÑA 2 (Reportes) ---
+    if st.session_state.rol == "Administradora":
+        with tab2:
+            st.markdown("### 📈 Cierre de Caja Diario (Hora Perú)")
+            conn = conectar()
+            
             # Sintaxis PostgreSQL para Zonas Horarias (UTC-5)
             query_general = """
-                SELECT SUM(monto_cobrado) as Ingresos_Totales, SUM(comision_pagada) as Pago_Estilistas, SUM(ganancia_salon_liquida) as Ganancia_Salon
+                SELECT SUM(monto_cobrado) as ingresos_totales, SUM(comision_pagada) as pago_estilistas, SUM(ganancia_salon_liquida) as ganancia_salon
                 FROM VENTAS_TPS 
                 WHERE (fecha - INTERVAL '5 hours')::date = (CURRENT_TIMESTAMP - INTERVAL '5 hours')::date
             """
             df_general = pd.read_sql_query(query_general, conn)
             
-            if df_general['Ingresos_Totales'][0] is not None:
+            if df_general['ingresos_totales'][0] is not None:
                 col_a, col_b, col_c = st.columns(3)
-                col_a.metric("Ingresos Totales (Hoy)", f"S/ {df_general['Ingresos_Totales'][0]:.2f}")
-                col_b.metric("A Pagar a Estilistas", f"S/ {df_general['Pago_Estilistas'][0]:.2f}")
-                col_c.metric("Ganancia Neta Salón", f"S/ {df_general['Ganancia_Salon'][0]:.2f}")
+                col_a.metric("Ingresos Totales (Hoy)", f"S/ {df_general['ingresos_totales'][0]:.2f}")
+                col_b.metric("A Pagar a Estilistas", f"S/ {df_general['pago_estilistas'][0]:.2f}")
+                col_c.metric("Ganancia Neta Salón", f"S/ {df_general['ganancia_salon'][0]:.2f}")
                 
                 st.markdown("#### ✂️ Comisiones a Pagar")
                 query_colab = """
-                    SELECT c.nombre as Estilista, COUNT(v.id_venta) as Servicios, SUM(v.comision_pagada) as Total_a_Pagar
+                    SELECT c.nombre as estilista, COUNT(v.id_venta) as servicios, SUM(v.comision_pagada) as total_a_pagar
                     FROM VENTAS_TPS v JOIN COLABORADORES c ON v.id_colaborador = c.id_colaborador
                     WHERE (v.fecha - INTERVAL '5 hours')::date = (CURRENT_TIMESTAMP - INTERVAL '5 hours')::date 
                     GROUP BY c.nombre
